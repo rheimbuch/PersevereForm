@@ -1,0 +1,3 @@
+[submodule "dojo"]
+	path = dojo
+	url = git://git.freelock.com/git/dojo.git
