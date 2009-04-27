@@ -1,8 +1,8 @@
 dojo.provide('yogo.schema._FormBuilder');
 
-dojo.schema._FormBuilder = {
+yogo.schema._FormBuilder = {
     build: function(schema) {
-        if(schema.properties)){
+        if(schema.properties){
             var schema = schema.properties;
         }
         var formElements = {};
@@ -41,13 +41,15 @@ dojo.schema._FormBuilder = {
         return formElements;
              
     },
-    _buildEntry(/*String*/ name, /*JsonSchema Entry*/ entry){
+    _buildEntry:function(/*String*/ name, /*JsonSchema Entry*/ entry){
         if(entry.type){
             var type = entry.type;
-            if(dojo.isArray(type))
+            if(dojo.isArray(type)){
                 type = 'array';
-            else if(dojo.isObject(type))
+            }
+            else if(dojo.isObject(type)){
                 type = 'object';
+            }
         }
         else {
             var type = 'object';
@@ -87,14 +89,14 @@ dojo.schema._FormBuilder = {
                 break;
         }
     }, 
-    _buildStringElement(entry, options){
+    _buildStringElement:function(entry, options){
         // type == 'string'
         var options = options || {};
         
         field = null;
         
         // handle maxLength:
-        if(entry.maxLenth) options.maxLength = entry.maxLength;
+        if(entry.maxLenth) {options.maxLength = entry.maxLength;}
         
         // handle minLength:
             // Still need to do this...
@@ -135,10 +137,10 @@ dojo.schema._FormBuilder = {
                     break;
                 case "email":
                     // simple email regexp
-                    options.regExp = ".+@.+";
+                    options.regExp = '.+@.+';
                     break;
                 case "ip-address":
-                    options.regExp = "\d{3}.\d{3}.\d{3}.\d{3}";
+                    options.regExp = '\d{3}.\d{3}.\d{3}.\d{3}';
                     break;
             }
         }
@@ -170,16 +172,16 @@ dojo.schema._FormBuilder = {
         var type = entry.type;
         
         // handle integers
-        if(type == "integer") options.constraints.places = 0; 
+        if(type == "integer") {options.constraints.places = 0;}
         
         // handle minimum:
-        if(entry.minimum) options.constraints.min = entry.minimum;
+        if(entry.minimum) {options.constraints.min = entry.minimum;}
         
         // handle maximum:
-        if(entry.maximum) options.constraints.max = entry.maximum;
+        if(entry.maximum) {options.constraints.max = entry.maximum;}
         
         // handle maxDecimal:
-        if(entry.maxDecimal) options.constraints.places = entry.maxDecimal;
+        if(entry.maxDecimal) {options.constraints.places = entry.maxDecimal;}
         
         var field = new dijit.form.NumberTextBox(options);
         field.schema = entry;
@@ -189,7 +191,7 @@ dojo.schema._FormBuilder = {
         dojo.require('dijit.form.CheckBox');
         
         options.value = true;
-        options.checked = false
+        options.checked = false;
         
         var field =  new dijit.form.CheckBox(options);
         field.schema = entry;
