@@ -1,3 +1,4 @@
-[submodule "dojo"]
-	path = dojo
+
+[submodule "tests/lib/dojo"]
+	path = tests/lib/dojo
 	url = git://git.freelock.com/git/dojo.git
