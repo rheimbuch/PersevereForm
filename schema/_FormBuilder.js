@@ -1,7 +1,7 @@
 dojo.provide('yogo.schema._FormBuilder');
 
 yogo.schema._FormBuilder = {
-    build: function(schema) {
+    buildFormElements: function(schema) {
         if(schema.properties){
             var schema = schema.properties;
         }
@@ -42,6 +42,19 @@ yogo.schema._FormBuilder = {
              
     },
     _buildEntry:function(/*String*/ name, /*JsonSchema Entry*/ entry){
+        var typeMap = dojo.mixin({
+            DEFAULT: this._buildStringElement,
+            "string": this._buildStringElement,
+            "number": this._buildNumberElement,
+            "integer": this._buildNumberElement,
+            "boolean": this._buildBooleanElement,
+            "date": null,
+            "object": null,
+            "array": null,
+            "null": null,
+            "any": null
+        }, this.typeMap);
+        
         if(entry.type){
             var type = entry.type;
             if(dojo.isArray(type)){
@@ -59,35 +72,7 @@ yogo.schema._FormBuilder = {
         // handle optional
         options.required = entry.optional || true;
         
-        switch(type){
-            case "string":
-                // Handle string
-                return this._buildStringElement(entry, options);
-                break;
-            case "number":
-                // Handle number
-                return this._buildNumberElement(entry, options);
-                break;
-            case "integer":
-                // Handle integer
-                return this._buildNumberElement(entry, options);
-                break;
-            case boolean:
-                // Handle boolean
-                break;
-            case "object":
-                // Handle object
-                break;
-            case "array":
-                // Handle array
-                break;
-            case "null":
-                // Handle null
-                break;
-            case "any":
-                // Handle any. Probably default to string?
-                break;
-        }
+        return ( typeMap[type] ? typeMap[type](entry, options) : this.typeMap.DEFAULT(entry, options) );
     }, 
     _buildStringElement:function(entry, options){
         // type == 'string'
@@ -102,67 +87,53 @@ yogo.schema._FormBuilder = {
             // Still need to do this...
             
         // handle format:
-        if(entry.format){
-            switch(entry.format){
-                case "date":
-                    // Create a DateTextBox
-                    dojo.require('dijit.form.DateTextBox');
-                    field =  new dijit.form.DateTextBox(options);
-                    break;
-                case "time":
-                    // Create a TimeTextBox
-                    dojo.require('dijit.form.TimeTextbox');
-                    var field = new dijit.form.TimeTextBox(options);
-                    break;
-                case "date-time":
-                    // Create DateTextBox ???
-                    break;
-                case "utc-millisec":
-                    // regex?
-                    break;
-                case "regex":
-                    //regex?
-                    break;
-                case "color":
-                    // CSS color ("red" or "#FFFFFF")
-                    break;
-                case "phone":
-                    // regex for phone number?
-                    break;
-                case "uri":
-                    // regex for uri?
-                    break;
-                case "url":
-                    // regex for absolute or relative url?
-                    break;
-                case "email":
-                    // simple email regexp
-                    options.regExp = '.+@.+';
-                    break;
-                case "ip-address":
-                    options.regExp = '\d{3}.\d{3}.\d{3}.\d{3}';
-                    break;
+        var formatMap = dojo.mixin({
+            "date": function(options){
+                dojo.require('yogo.schema.widget.DateFormatTextBox');
+                return new yogo.schema.widget.DateFormatTextBox(options);
+                // dojo.require('dijit.form.DateTextBox');
+                // return new dijit.form.DateTextBox(options);
+            },
+            "time": function(options){
+                dojo.require('yogo.schema.widget.TimeFormatTextBox');
+                return new yogo.schema.widget.TimeFormatTextBox(options);
+            },
+            "date-time": function(options){
+                dojo.require('yogo.schema.widget.DateTimeFormatTextBox');
+                return new yogo.schema.widget.DateTimeFormatTextBox(options);
+            },
+            "utc-millisec": null,
+            "regex": null,
+            "color": null,
+            "phone": null,
+            "uri": null,
+            "url": null,
+            "email": function(options){
+                options.regExp = '.+@.+';
+                return new dijit.form.ValidationTextBox(options)
+            },
+            "ip-address": function(options){
+                options.regExp = '\d{3}.\d{3}.\d{3}.\d{3}';
+                return new dijit.form.ValidationTextBox(options)
+            } 
+        }, this.formatMap);
+        
+        if(formatMap[entry.format]){
+            console.debug("building using format: " + entry.format);
+            field = formatMap[entry.format](options);
+        }
+        else {
+            // handle pattern: (regex).
+            if(entry.patter){
+                options.regExp = entry.pattern;
             }
-        }
-        
-        // handle pattern: (regex). pattern will override format
-        if(entry.pattern) {
-            options.regExp = entry.pattern;
-            
-        }
-        
-        // if we have a Regular Expression in our options...
-        if(options.regExp){
             dojo.require('dijit.form.ValidationTextBox');
             field = new dijit.form.ValidationTextBox(options);
         }
-        // or handle plain string with no further validation
-        else {
-            dojo.require('dijit.form.TextBox');
-            field = new dijit.form.TextBox(options);
-        }
-        field.schema = entry;
         
+        // save the schema into the element
+        field.schema = entry;
+        return field;
     }, 
     _buildNumberElement: function(entry, options){
         dojo.require('dijit.form.NumberTextBox');
