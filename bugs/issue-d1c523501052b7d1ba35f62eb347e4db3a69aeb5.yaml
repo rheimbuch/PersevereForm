@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Implement Full form generation from schema definition.
+desc: Form widgets can be generated from schemas, and form widgets have been extended to allow for Persevere compatible values. Still need to extend or reimplement a complete form widget that is capable of creating a nicely layed out form complete with labels and form widgets from a aschema.
+type: :task
+component: schema-form
+release: 
+reporter: Ryan Heimbuch <rheimbuch@gmail.com>
+status: :unstarted
+disposition: 
+creation_time: 2009-04-28 21:32:24.859048 Z
+references: []
+
+id: d1c523501052b7d1ba35f62eb347e4db3a69aeb5
+log_events: 
+- - 2009-04-28 21:32:34.383073 Z
+  - Ryan Heimbuch <rheimbuch@gmail.com>
+  - created
+  - ""
