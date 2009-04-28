@@ -8,15 +8,34 @@
 	<meta name="generator" content="TextMate http://macromates.com/">
 	<meta name="author" content="Ryan Heimbuch">
 	<!-- Date: 2009-04-24 -->
+	<style type="text/css" media="screen">
+		@import "lib/dojo/dojo/resources/dojo.css";
+		@import "lib/dojo/dijit/themes/soria/soria.css";
+	</style>
 	
 	<script src="lib/dojo/dojo/dojo.js" djConfig="parseOnLoad:true" type="text/javascript" charset="utf-8"></script>
 	
 	<script type="text/javascript" charset="utf-8">
-		dojo.registerModulePath("yogo", "..");
+		dojo.registerModulePath("yogo", "../../../..");
 		dojo.require("yogo.schema._FormBuilder");
+		dojo.require("yogo.tests.schemas");
+		
+		dojo.require('dijit.form.Form');
+	</script>
+	<script type="text/javascript" charset="utf-8">
+	dojo.addOnLoad(function(){
+		formWidgets = yogo.schema._FormBuilder.buildFormElements(yogo.tests.schemas.Person);
+		
+		form = new dijit.form.Form();
+		document.body.appendChild(form.domNode);
+		
+		for(var name in formWidgets){
+			form.domNode.appendChild(formWidgets[name].domNode);
+		}
+	});
 	</script>
 </head>
-<body>
+<body class="soria">
 
 </body>
 </html>
