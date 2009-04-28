@@ -1,5 +1,7 @@
 dojo.provide('yogo.schema._FormBuilder');
 
+dojo.require('yogo.schema._FormWidgetExtensions');
+
 yogo.schema._FormBuilder = {
     buildFormElements: function(schema) {
         if(schema.properties){
@@ -89,18 +91,18 @@ yogo.schema._FormBuilder = {
         // handle format:
         var formatMap = dojo.mixin({
             "date": function(options){
-                dojo.require('yogo.schema.widget.DateFormatTextBox');
-                return new yogo.schema.widget.DateFormatTextBox(options);
-                // dojo.require('dijit.form.DateTextBox');
-                // return new dijit.form.DateTextBox(options);
+                dojo.require('dijit.form.DateTextBox');
+                options.schemaFormat = "date";
+                return new dijit.form.DateTextBox(options);
             },
             "time": function(options){
-                dojo.require('yogo.schema.widget.TimeFormatTextBox');
-                return new yogo.schema.widget.TimeFormatTextBox(options);
+                dojo.require('dijit.form.TimeTextBox');
+                return new dijit.form.TimeTextBox(options);
             },
             "date-time": function(options){
-                dojo.require('yogo.schema.widget.DateTimeFormatTextBox');
-                return new yogo.schema.widget.DateTimeFormatTextBox(options);
+                dojo.require('dijit.form.DateTextBox');
+                options.schemaFormat = "date-time";
+                return new dijit.form.DateTextBox(options);
             },
             "utc-millisec": null,
             "regex": null,
