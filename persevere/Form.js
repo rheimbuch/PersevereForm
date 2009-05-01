@@ -23,5 +23,12 @@ dojo.declare('yogo.persevere.Form', yogo.schema.Form, {
     },
     _updateFormFromItem: function() {
         this.attr('jsonValue', this.item);
+    },
+    onChange: function(value){
+        if(this.item){
+            for(var name in value){
+                this.store.setValue(this.item, name, value[name]);
+            }
+        }
     }
 });

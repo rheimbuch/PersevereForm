@@ -85,8 +85,18 @@ dojo.declare('yogo.schema._FormBuilder', null, {
         console.debug("Options in buildEntry");
         console.debug(options);
         
-        return ( typeMap[type] ? typeMap[type](entry, options) : typeMap.DEFAULT(entry, options) );
+        var field = ( typeMap[type] ? typeMap[type](entry, options) : typeMap.DEFAULT(entry, options) );
+        dojo.connect(field, "onChange", dojo.hitch(this, function(value){
+            if(name){
+                var newVal = {};
+                newVal[name] = value;
+                console.debug(newVal);
+                this._valueChange(newVal);
+            }
+        }));
+        return field;
     }, 
+    _valueChange:function(){},
     _buildStringElement:function(entry, options){
         // type == 'string'
         var options = options || {};
@@ -124,12 +134,12 @@ dojo.declare('yogo.schema._FormBuilder', null, {
             "url": null,
             "email": function(options){
                 options.regExp = '.+@.+';
-                options.promptMessage = "A valid email is required."
-                return new dijit.form.ValidationTextBox(options)
+                options.promptMessage = "A valid email is required.";
+                return new dijit.form.ValidationTextBox(options);
             },
             "ip-address": function(options){
                 options.regExp = '\d{3}.\d{3}.\d{3}.\d{3}';
-                return new dijit.form.ValidationTextBox(options)
+                return new dijit.form.ValidationTextBox(options);
             } 
         }, this.formatMap);
         

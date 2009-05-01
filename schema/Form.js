@@ -42,6 +42,43 @@ dojo.declare('yogo.schema.Form', [dijit.form.Form, yogo.schema._FormBuilder], {
             }
             this.connectChildren();
         }
+    },
+    _getJsonValueAttr: function() {
+        var obj = {};
+        dojo.forEach(this.getChildren(), function(widget){
+            var name = widget.name;
+            if(!name||widget.disabled){ return; }
+        
+            var value = widget.attr('jsonValue');
+            
+            dojo.setObject(name, value, obj);
+        });
+        
+        return obj;
+    },
+    _setJsonValueAttr: function(/*Object*/ obj) {
+        dojo.forEach(this.getChildren(), function(widget){
+            if(!widget.name){ return; }
+            if(obj.hasOwnProperty(widget.name) && (obj[widget.name] != undefined)){
+                widget.attr('jsonValue', obj[widget.name]);
+            }
+        });
+    },
+    _valueChange:function(/*Object*/ value) {
+        this.inherited(arguments);
+        if(this.name){
+            var val = {};
+            val[name] = value;
+        }
+        else { val = value; }
+        
+        this.onChange(val);
+    },
+    onChange: function(){},
+    clear: function(){
+        dojo.forEach(this.getDescendants(), function(widget){
+            widget.attr('value', null);
+        });
     }
 
 });
