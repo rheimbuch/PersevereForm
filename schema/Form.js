@@ -6,7 +6,28 @@ dojo.require('yogo.schema._FormBuilder');
 dojo.declare('yogo.schema.Form', [dijit.form.Form, yogo.schema._FormBuilder], {
     schema:null,
     postCreate: function() {
+        this._buildForm();
+        this.inherited(arguments);
+    },
+    _setSchemaAttr: function(schema){
+        this.schema = schema;
+        if(this._created) { this._buildForm() };
+    },
+    _buildObjectElement: function(entry, options){
+        options.schema = entry;
+        var form = new yogo.schema.Form(options);
+        return form;
+    },
+    _buildForm: function() {
         if(this.schema){
+        
+            console.debug("Building Form for: " + this.schema.id);
+            console.debug(this.schema);
+            // Clear existing form elements & labels
+            this.destroyDescendants();
+            dojo.empty(this.domNode);
+        
+            // Build new form elements
             var subElements = this._buildFormElements(this.schema);
             var elementList = dojo.create('ul');
             this.domNode.appendChild(elementList);
@@ -19,13 +40,8 @@ dojo.declare('yogo.schema.Form', [dijit.form.Form, yogo.schema._FormBuilder], {
                 listItem.appendChild(subElements[name].domNode);
                 elementList.appendChild(listItem);
             }
+            this.connectChildren();
         }
-        this.inherited("postCreate", arguments);
-    },
-    _buildObjectElement: function(entry, options){
-        
-        options.schema = entry;
-        var form = new yogo.schema.Form(options);
-        return form;
     }
-})
+
+});

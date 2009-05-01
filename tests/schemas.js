@@ -29,3 +29,32 @@ yogo.tests.schemas.Person = {
         }
     }
 }
+
+yogo.tests.schemas.Company = {
+    id: "Company",
+    description: "Example of a nexted schema",
+    properties: {
+        name: {
+            type: "string",
+            title: "Company Name"
+        },
+        manager: {
+            type: "object",
+            properties: {
+                firstName: {
+                    type: "string",
+                    title: "First Name"
+                },
+                lastName: {
+                    type: "string",
+                    title: "Last Name"
+                },
+                birthday: {
+                    type: "string",
+                    format: "date-time",
+                    title: "Birth Date"
+                }
+            }
+        }
+    }
+};

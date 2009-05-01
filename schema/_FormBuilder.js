@@ -2,16 +2,22 @@ dojo.provide('yogo.schema._FormBuilder');
 
 dojo.require('yogo.schema._FormWidgetExtensions');
 
-yogo.schema._FormBuilder = {
-    buildFormElements: function(schema) {
+dojo.declare('yogo.schema._FormBuilder', null, {
+    _buildForm: function(schema) {
+        var form = this._buildObjectElement(schema, {});
+        return form;
+    },
+    _buildFormElements: function(schema) {
         if(schema.properties){
             var schema = schema.properties;
         }
         var formElements = {};
         // Handle top level properties in schema
         for(var name in schema){
-            // process each schema entry
-            formElements[name] = this._buildEntry(name, schema[name]);
+            // process each schema entry if not a hidden field (__field:"isHidden")
+            if(! /^__.+$/.test(name)) {
+                formElements[name] = this._buildEntry(name, schema[name]);
+            }
         }
         
         // process the title:
@@ -51,7 +57,7 @@ yogo.schema._FormBuilder = {
             "integer": this._buildNumberElement,
             "boolean": this._buildBooleanElement,
             "date": null,
-            "object": null,
+            "object": this._buildObjectElement,
             "array": null,
             "null": null,
             "any": null
@@ -70,20 +76,26 @@ yogo.schema._FormBuilder = {
             var type = 'object';
         }
         
-        var options = {name: name};
+        var options = {};
+        options.name = name;
+        options.label = entry.title || name;
         // handle optional
-        options.required = entry.optional || true;
+        options.required = !entry.optional;
+        options.promptMessage = options.required ? "This field is required" : "";
+        console.debug("Options in buildEntry");
+        console.debug(options);
         
-        return ( typeMap[type] ? typeMap[type](entry, options) : this.typeMap.DEFAULT(entry, options) );
+        return ( typeMap[type] ? typeMap[type](entry, options) : typeMap.DEFAULT(entry, options) );
     }, 
     _buildStringElement:function(entry, options){
         // type == 'string'
         var options = options || {};
-        
+        console.debug("options at beginning of buildStringElement");
+        console.debug(options);
         field = null;
         
         // handle maxLength:
-        if(entry.maxLenth) {options.maxLength = entry.maxLength;}
+        if(entry.maxLength) {options.maxLength = entry.maxLength;}
         
         // handle minLength:
             // Still need to do this...
@@ -112,6 +124,7 @@ yogo.schema._FormBuilder = {
             "url": null,
             "email": function(options){
                 options.regExp = '.+@.+';
+                options.promptMessage = "A valid email is required."
                 return new dijit.form.ValidationTextBox(options)
             },
             "ip-address": function(options){
@@ -126,13 +139,17 @@ yogo.schema._FormBuilder = {
         }
         else {
             // handle pattern: (regex).
-            if(entry.patter){
+            if(entry.pattern){
                 options.regExp = entry.pattern;
             }
             dojo.require('dijit.form.ValidationTextBox');
+            // console.debug(entry);
+            // console.debug(options);
             field = new dijit.form.ValidationTextBox(options);
         }
         
+        console.debug('options at end of buildStringElement');
+        console.debug(options);
         // save the schema into the element
         field.schema = entry;
         return field;
@@ -169,6 +186,18 @@ yogo.schema._FormBuilder = {
         var field =  new dijit.form.CheckBox(options);
         field.schema = entry;
         return field;
+    },
+    _buildObjectElement: function(entry, options){
+        dojo.require('yogo.schema.Form');
+        
+        var form = new yogo.schema.Form(options);
+        form.schema = entry;
+        var subElements = this._buildFormElements(entry);
+        console.debug(subElements);
+        for(var name in subElements){
+            form.domNode.appendChild(subElements[name].domNode);
+        }
+        return form;
     }
 
-};
+});

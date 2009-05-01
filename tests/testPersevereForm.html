@@ -27,34 +27,22 @@
 	
 	<script type="text/javascript" charset="utf-8">
 		dojo.registerModulePath("yogo", "../../../..");
-		dojo.require("yogo.schema._FormBuilder");
-		dojo.require("yogo.schema.Form");
-		dojo.require("yogo.tests.schemas");
-		
-		dojo.require('dijit.form.Form');
+		dojo.require('yogo.persevere.Form');
+		dojo.require('dojox.data.PersevereStore');
 	</script>
 	<script type="text/javascript" charset="utf-8">
-	dojo.addOnLoad(function(){
-		// formWidgets = yogo.schema._FormBuilder.buildFormElements(yogo.tests.schemas.Person);
-		// 
-		// form = new dijit.form.Form();
-		// document.body.appendChild(form.domNode);
-		// 
-		// for(var name in formWidgets){
-		// 	form.domNode.appendChild(formWidgets[name].domNode);
-		// }
+		storeDef = dojox.data.PersevereStore.getStores("http://dev.msu.montana.edu:8080/")
 		
-		// form = yogo.schema._FormBuilder.buildForm(yogo.tests.schemas.Person);
-		// 		document.body.appendChild(form.domNode);
-		
-		form = new yogo.schema.Form({schema: yogo.tests.schemas.Person});
-		document.body.appendChild(form.domNode);
-		
-		document.body.appendChild(dojo.create('hr'));
-		
-		form2 = new yogo.schema.Form({schema: yogo.tests.schemas.Company});
-		document.body.appendChild(form2.domNode);
-	});
+		dojo.addOnLoad(function(){
+			storeDef.addCallback(function(stores) {
+				pStore = stores;
+				form = new yogo.persevere.Form({store: stores.Address});
+				dojo.body().appendChild(form.domNode);
+				dojo.body().appendChild(dojo.create('hr'));
+				form2 = new yogo.persevere.Form({store: stores.Person});
+				dojo.body().appendChild(form2.domNode);
+			});
+		});
 	</script>
 </head>
 <body class="soria">
