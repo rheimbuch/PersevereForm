@@ -10,11 +10,16 @@ dojo.declare('yogo.persevere.Form', yogo.schema.Form, {
     _setStoreAttr: function(store){
         if(store.schema) { 
             this.store = store;
-            dojo.connect(store, "onSet", this, "_onStoreItemUpdate");
+            this._storeOnSetConnection && dojo.disconnect(this._storeOnSetConnection);
+            this._storeOnSetConnection = dojo.connect(store, "onSet", this, "_onStoreItemUpdate");
             this.attr('schema', store.schema);
         };
     },
     _setItemAttr: function(item) {
+        var itemStore = dojox.data._getStoreForItem(item);
+        if(itemStore !== this.store){
+            this.attr('store', itemStore);
+        }
         this._loadItem(item);
         console.debug(item);
         this.item = item;
@@ -48,19 +53,49 @@ dojo.declare('yogo.persevere.Form', yogo.schema.Form, {
             // for(var name in value){
             //     this.store.setValue(this.item, name, value[name]);
             // }
-            this.save();
+            this.saveForm();
         }
     },
-    save: function() {
+    saveItem: function(item) {
+        var item = item || this.item;
+        if(!item){ return; }
+        
+        var store = dojox.data._getStoreForItem(item);
+        if(!store){ return; }
+        store.save();
+        
+        for(var prop in item){
+            this.saveItem(item[prop]);
+        }
+    },
+    saveForm: function() {
         if(!this.store) { return; }
+        
+        var value = this.attr('jsonValue');
         if(this.item){
-            var value = this.attr('jsonValue');
-            for(var name in value){
-                this.store.setValue(this.item, name, value[name]);
-            }
+            this._mergeItem({value: value});
         }
         else {
-            this.attr('item', this.store.newItem(this.attr('jsonValue')));
+            this.attr('item', this.store.newItem(value));
+        }
+    },
+    _mergeItem: function(opts){
+        var item = opts.item || this.item;
+        var value = opts.value || {};
+        for(var name in value){
+            if(item[name] && item[name]['__id']){
+                console.debug("Preparing to merge: " + name);
+                console.debug(item[name]);
+                this._mergeItem({item: item[name], value: value[name]});
+            }
+            else{
+                
+                if(item[name] !== value[name]){
+                    console.debug("setValue("+name+")");
+                    console.debug(value[name]);
+                    this.store.setValue(item, name, value[name]);
+                }
+            }
         }
     }
 });
