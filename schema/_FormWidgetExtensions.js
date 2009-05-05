@@ -19,7 +19,7 @@ dojo.extend(dijit.form._FormMixin, {
         
         return obj;
     },
-    _setJsonValueAttr: function(obj) {
+    _setJsonValueAttr: function(obj, priorityChange) {
         dojo.forEach(this.getChildren(), function(widget){
             if(!widget.name){ return; }
             if(obj.hasOwnProperty(widget.name) && (obj[widget.name] != undefined)){
@@ -40,7 +40,7 @@ dojo.extend(dijit.form._FormWidget, {
         return this.attr('value');
     },
     _setJsonValueAttr: function(value) {
-        return this.attr('value', value);
+        return this._setValueAttr(value, false);
     }
 });
 
@@ -86,7 +86,7 @@ dojo.extend(dijit.form.DateTextBox, {
             }
         };
         
-        var result = map[this.format] ? this.attr('value', map[this.format](value)) : this.attr('value', map['date-time'](value));
+        var result = map[this.format] ? this._setValueAttr( map[this.format](value), priorityChange || false) : this._setValueAttr(map['date-time'](value), priorityChange || false);
         return result;
     }
 });
@@ -102,6 +102,6 @@ dojo.extend(dijit.form.TimeTextBox, {
         }
     },
     _setJsonValueAttr: function(value) {
-        return this.attr('value', dojo.date.locale.parse(val, {selector: 'time', timePattern: 'hh:mm:ss'}));
+        return this._setValueAttr(dojo.date.locale.parse(val, {selector: 'time', timePattern: 'hh:mm:ss'}), priorityChange || false);
     }
 });
