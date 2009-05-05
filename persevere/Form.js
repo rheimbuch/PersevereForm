@@ -15,8 +15,25 @@ dojo.declare('yogo.persevere.Form', yogo.schema.Form, {
         };
     },
     _setItemAttr: function(item) {
+        this._loadItem(item);
+        console.debug(item);
         this.item = item;
         this._updateFormFromItem();
+    },
+    _loadItem: function(item) {
+        var self = this;
+        var isItem = this.store && this.store.isItem(item, true);
+        // Force loading of lazy values
+        var attributes = this.store.getAttributes(item);
+        dojo.forEach(attributes, function(prop){
+            //console.debug("processing: " + prop);
+            dojox.rpc._sync = true; 
+            var value = dojox.data.ServiceStore.prototype.loadItem({item:item[prop]});
+            //console.debug(value);
+            if(dojo.isObject(value) ){
+                self._loadItem(value);
+            }
+        });
     },
     _onStoreItemUpdate: function(item, attribute, oldValue, newValue) {
         if(this.updateFormOnStoreChange && (this.item.id == item.id)){
