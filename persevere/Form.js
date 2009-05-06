@@ -65,7 +65,8 @@ dojo.declare('yogo.persevere.Form', yogo.schema.Form, {
         store.save();
         
         for(var prop in item){
-            this.saveItem(item[prop]);
+            console.debug(prop);
+            item[prop] && this.saveItem(item[prop]);
         }
     },
     saveForm: function() {
