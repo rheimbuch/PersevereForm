@@ -192,8 +192,13 @@ dojo.declare('yogo.schema._FormBuilder', null, {
         
         options.value = true;
         options.checked = false;
+        // aCheckBox.attr('label', 'foo') blows up if aCheckBox.containerNode == null
+        //  so we'll hack it and set it manually
+        var label = options.label;
+        delete options.label;
         
         var field =  new dijit.form.CheckBox(options);
+        field.label = label;
         field.schema = entry;
         return field;
     },
