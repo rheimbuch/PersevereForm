@@ -22,6 +22,8 @@ dojo.declare('yogo.persevere.Form', yogo.schema.Form, {
         }
         this._loadItem(item);
         console.debug(item);
+        this.item = null;
+        this.reset();
         this.item = item;
         this._updateFormFromItem();
     },
