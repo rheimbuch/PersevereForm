@@ -23,7 +23,7 @@ dojo.extend(dijit.form._FormMixin, {
     _setJsonValueAttr: function(obj) {
         dojo.forEach(this.getChildren(), function(widget){
             if(!widget.name){ return; }
-            if(obj.hasOwnProperty(widget.name) && (obj[widget.name] != undefined)){
+            if(obj.hasOwnProperty(widget.name) && (obj[widget.name] !== undefined)){
                 widget.attr('jsonValue', obj[widget.name]);
             }
         });
