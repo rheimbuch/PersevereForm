@@ -5,6 +5,8 @@ dojo.require('dijit.form._FormWidget');
 dojo.require('dijit.form.DateTextBox');
 dojo.require('dijit.form.TimeTextBox');
 dojo.require('dijit.form.NumberTextBox');
+dojo.require('dijit.form.ToggleButton');
+dojo.require('dijit.form.CheckBox');
 
 dojo.extend(dijit.form._FormMixin, {
     _getJsonValueAttr: function() {
@@ -115,4 +117,46 @@ dojo.extend(dijit.form.NumberTextBox, {
         var value = this.attr('value');
         return isNumber(value) ? value : 0;
     }
+});
+
+/* Unlike the other form widgets, CheckBox subclasses ToggleButton. Unfortunately,
+    ToggleButton ALWAYS sends the onChange event when you set attr('checked' true|false).
+    These extensions override that behavior in both ToggleButton and Checkbox, and allow
+    attr('checked') and attr('value') to be set programmatically without firing
+    the onChange event. Eventually we should see if this can be upstreamed into
+    dojo trunk.
+*/
+dojo.extend(dijit.form.ToggleButton, {
+    _setCheckedAttr: function(/*Boolean*/ value, /*Boolean?*/ priorityChange){
+		this.checked = value;
+		dojo.attr(this.focusNode || this.domNode, "checked", value);
+		dijit.setWaiState(this.focusNode || this.domNode, "pressed", value);
+		this._setStateClass();		
+		this._handleOnChange(value, priorityChange || true);
+	}
+});
+
+dojo.extend(dijit.form.CheckBox, {
+    _setValueAttr: function(/*String or Boolean*/ newValue, /*Boolean?*/ priorityChange){
+		// summary:
+		//		Handler for value= attribute to constructor, and also calls to
+		//		attr('value', val).
+		// description:
+		//		During initialization, just saves as attribute to the <input type=checkbox>.
+		//		
+		//		After initialization,
+		//		when passed a boolean, controls whether or not the CheckBox is checked.
+		//		If passed a string, changes the value attribute of the CheckBox (the one
+		//		specified as "value" when the CheckBox was constructed (ex: <input
+		//		dojoType="dijit.CheckBox" value="chicken">)
+		if(typeof newValue == "string"){
+			this.value = newValue;
+			dojo.attr(this.focusNode, 'value', newValue);
+			newValue = true;
+		}
+		if(this._created){
+			//this.attr('checked', newValue);
+			this._setCheckedAttr(newValue, priorityChange);
+		}
+	}
 });
