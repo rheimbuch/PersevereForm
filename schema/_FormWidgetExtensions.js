@@ -4,6 +4,7 @@ dojo.require('dijit.form._FormMixin');
 dojo.require('dijit.form._FormWidget');
 dojo.require('dijit.form.DateTextBox');
 dojo.require('dijit.form.TimeTextBox');
+dojo.require('dijit.form.NumberTextBox');
 
 dojo.extend(dijit.form._FormMixin, {
     _getJsonValueAttr: function() {
@@ -103,5 +104,15 @@ dojo.extend(dijit.form.TimeTextBox, {
     },
     _setJsonValueAttr: function(value) {
         return this._setValueAttr(dojo.date.locale.parse(val, {selector: 'time', timePattern: 'hh:mm:ss'}), false);
+    }
+});
+
+dojo.extend(dijit.form.NumberTextBox, {
+    _getJsonValueAttr: function() {
+        function isNumber(value) { 
+            return typeof value === 'number' && isFinite(value);
+        }
+        var value = this.attr('value');
+        return isNumber(value) ? value : 0;
     }
 });
