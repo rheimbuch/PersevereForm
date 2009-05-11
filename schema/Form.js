@@ -77,7 +77,7 @@ dojo.declare('yogo.schema.Form', [dijit.form.Form, yogo.schema._FormBuilder], {
     onChange: function(){},
     clear: function(){
         dojo.forEach(this.getDescendants(), function(widget){
-            widget.attr('value', null);
+            widget.attr('jsonValue', null);
         });
     }
 
