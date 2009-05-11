@@ -128,11 +128,14 @@ dojo.extend(dijit.form.NumberTextBox, {
 */
 dojo.extend(dijit.form.ToggleButton, {
     _setCheckedAttr: function(/*Boolean*/ value, /*Boolean?*/ priorityChange){
+        if(priorityChange !== false){
+            var priorityChange = true;
+        }
 		this.checked = value;
 		dojo.attr(this.focusNode || this.domNode, "checked", value);
 		dijit.setWaiState(this.focusNode || this.domNode, "pressed", value);
 		this._setStateClass();		
-		this._handleOnChange(value, priorityChange || true);
+		this._handleOnChange(value, priorityChange);
 	}
 });
 
