@@ -89,7 +89,7 @@ dojo.extend(dijit.form.DateTextBox, {
             }
         };
         
-        var result = map[this.format] ? this._setValueAttr( map[this.format](value), false) : this._setValueAttr(map['date-time'](value), priorityChange || false);
+        var result = map[this.format] ? this._setValueAttr( map[this.format](value), false) : this._setValueAttr(map['date-time'](value), false);
         return result;
     }
 });
